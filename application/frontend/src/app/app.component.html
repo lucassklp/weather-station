@@ -1,9 +1,19 @@
 
 
-<div style="display: block; width: 600px; height: 800px;">
+<div style="display: block; width: 600px; height: 400px;">
 
-    <canvas baseChart
-            [data]="temperatureChart"
+    <canvas baseChart #temperatureChart
+            [data]="temperatureChartData"
             [options]="lineChartOptions"
             [type]="lineChartType"></canvas>
 </div>
+
+
+<div style="display: block; width: 600px; height: 400px;">
+
+    <canvas baseChart #humidityChart
+            [data]="humidityChartData"
+            [options]="lineChartOptions"
+            [type]="lineChartType"></canvas>
+</div>
+

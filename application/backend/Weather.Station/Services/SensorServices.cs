@@ -20,21 +20,18 @@ namespace Weather.Station.Services
             // This part probably will be changed in the future to support ZigBee communication.
             // For now, we use mocked values
             logger.LogInformation("Setting up timer");
-            this.sensorObservable = Observable.Timer(TimeSpan.FromSeconds(1))
+            this.sensorObservable = Observable.Timer(TimeSpan.FromSeconds(5))
                 .Repeat()
                 .Select(_ => WeatherStationValues.Random());
-
-
-
 
             // Asynchronously store the sensor values to database (I know Rx is beautiful <3)
             sensorObservable.Subscribe(async sensorValues =>
             {
                 await hubContext.Clients.Group("chart")
                     .SendAsync("sensor-values", sensorValues);
-                logger.LogInformation($"Saving new entity: {sensorValues}");
-                daoContext.WeatherStation.Add(sensorValues);
-                await daoContext.SaveChangesAsync();
+                
+                //daoContext.WeatherStation.Add(sensorValues);
+                //await daoContext.SaveChangesAsync();
             });
         }
 

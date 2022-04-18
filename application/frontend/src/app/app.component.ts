@@ -11,11 +11,28 @@ import { SensorService } from './services/sensor.service';
 })
 export class AppComponent implements OnInit{
 
-  public temperatureChart: ChartConfiguration['data'] = {
+  public temperatureChartData: ChartConfiguration['data'] = {
     datasets: [
       {
         data: [ ],
         label: 'Temperatura',
+        backgroundColor: 'rgba(148,159,177,0.2)',
+        borderColor: 'rgba(148,159,177,1)',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        fill: 'origin',
+      }
+    ],
+    labels: [ ]
+  };
+
+  public humidityChartData: ChartConfiguration['data'] = {
+    datasets: [
+      {
+        data: [ ],
+        label: 'Humidade',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -55,8 +72,11 @@ export class AppComponent implements OnInit{
 
   public lineChartType: ChartType = 'line';
   
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChild('temperatureChart', {read: BaseChartDirective}) 
+  temperatureChart?: BaseChartDirective;
 
+  @ViewChild('humidityChart', {read: BaseChartDirective}) 
+  humidityChart?: BaseChartDirective;
 
   constructor(private sensorService: SensorService){
     // sensorService.getLastSensorValues().subscribe(storedValues => {
@@ -66,26 +86,33 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.sensorService.getLastSensorValues().subscribe(values => {
-      this.pushMany(this.temperatureChart, values)
-      this.sensorService.getRealtimeSensorValues()
-      .subscribe(value => this.pushOne(this.temperatureChart, value))
+      this.pushMany(this.temperatureChartData, values, (value: WeatherStationValues) => value.temperature)
+      this.temperatureChart?.update()
+
+      this.pushMany(this.humidityChartData, values, (value: WeatherStationValues) => value.humidity)
+      this.humidityChart?.update()
+
+      this.sensorService.getRealtimeSensorValues().subscribe(value => {
+        this.pushOne(this.temperatureChartData, value.temperature, value.instant)
+        this.temperatureChart?.update()
+
+        this.pushOne(this.humidityChartData, value.humidity, value.instant)
+        this.humidityChart?.update()
+      })
     })
   }
 
-  public pushOne(chart: ChartData, value: WeatherStationValues): void {
+  public pushOne(chart: ChartData, value: any, instant: Date): void {
     console.log(value)
-    chart.datasets[0].data.push(value.temperature)
-    chart.labels?.push(value.instant)
-    this.chart?.update();
+    chart.datasets[0].data.push(value)
+    chart.labels?.push(instant)
   }
 
-  public pushMany(chart: ChartData, values: WeatherStationValues[]): void {
+  public pushMany(chart: ChartData, values: WeatherStationValues[], fn: (val: WeatherStationValues) => number): void {
     values.forEach(sensorValue => {
-      chart.datasets[0].data.push(sensorValue.temperature)
+      chart.datasets[0].data.push(fn(sensorValue))
       chart.labels?.push(sensorValue.instant)
     })
-    
-    this.chart?.update();
   }
 
 }

@@ -1,13 +1,14 @@
 //  Includes
 //  for BMP180 sensor
 #include <SFE_BMP180.h>
-#include <Wire.h>
+#include <Wire.h> // Library to communicate with I2C https://www.arduino.cc/en/reference/wire
 //  for DHT
 #include "dht.h"
 //  for Water-Sensor
 #define POWER_PIN  7
 #define SIGNAL_PIN A3
-
+//  for SI1145
+#include "Adafruit_SI1145.h"
 
 //  Defines
 //  for BMP180
@@ -24,13 +25,16 @@ dht dhtObject;
 int ledPin = 9;
 //  for Water-sensor
 int value = 0;
+//  for SI1145
+Adafruit_SI1145 uv = Adafruit_SI1145();
+
 
 void setup()
 {
   Serial.begin(9600);
   while(!Serial){ // wait till serial is initiated
     ;
-  }
+    }
 
 //  Relate to BMP180
   if (bmp180Object.begin())
@@ -103,6 +107,7 @@ void loop()
   }
   else Serial.println("Erro em iniciar a medida de Temperatura");
 
+  Serial.println("1111111111111111111111111111");
 
   //  Relate to DHT
   dhtObject.read11(dht_pin); // DHT11 command to do measurements
@@ -114,6 +119,7 @@ void loop()
   Serial.print("Temperatura: ");
   Serial.print(dhtObject.temperature);
   Serial.println("ºC  ");
+  Serial.println("2222222222222222222222222222");
         
   //  Relater to Anemometer
   int sensorValue = analogRead(A1);
@@ -125,14 +131,15 @@ void loop()
     Serial.println("Anemometer Measurements #####################: ");
     Serial.print("Valor do Anenometro: ");
     Serial.println(sensorValue);
-    Serial.println( );
+    Serial.println( "333333333333333333333333333");
   } else {
     Serial.println( );
     Serial.println("Anemometer Measurements #####################: ");
     Serial.println("Valor do Anenometro: 0");
-    Serial.println( );
+    Serial.println("333333333333333333333333333" );
     }
-  delay(3000);
+  Serial.println();
+  //delay(3000);
 
   
   //  Related to Water-sensor
@@ -144,10 +151,21 @@ void loop()
 
   Serial.print("Water-sensor value: ");
   Serial.println(value);
-
+  Serial.println("44444444444444444444444444444");
+  
+  //  Related to SI1145 UV sensor
+  Serial.println( );
+  Serial.println("UV Sensor #####################: ");
+  Serial.print("Vis: "); Serial.println(uv.readVisible());
+  Serial.print("IR: "); Serial.println(uv.readIR());
+  float UVindex = uv.readUV();
+  UVindex /= 100.0;  // the index is multiplied by 100 so to get the integer index, divide by 100!
+  Serial.print("UV: ");  Serial.println(UVindex);
+  Serial.println("555555555555555555555555555555");
   //  Serial dat to send to PC
+  
 
     
-  delay(5000);  // Pause for 10 seconds before repeat the loop
+  delay(10000);  // Pause for 10 seconds before repeat the loop
 
 }

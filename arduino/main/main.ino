@@ -27,7 +27,10 @@ int ledPin = 9;
 int value = 0;
 //  for SI1145
 Adafruit_SI1145 uv = Adafruit_SI1145();
-
+// for RGB Led
+int red_light_pin= 11;
+int green_light_pin = 10;
+int blue_light_pin = 9;
 
 void setup()
 {
@@ -49,6 +52,10 @@ void setup()
   pinMode(POWER_PIN, OUTPUT);   // Configuração do D7 como pin output
   digitalWrite(POWER_PIN, LOW); // Desligar o sensor
 
+// Related to RGB Led
+  pinMode(red_light_pin, OUTPUT);
+  pinMode(green_light_pin, OUTPUT);
+  pinMode(blue_light_pin, OUTPUT);
 
 }
 
@@ -106,8 +113,8 @@ void loop()
     else Serial.println("Erro em recolher a Temperatura medida");
   }
   else Serial.println("Erro em iniciar a medida de Temperatura");
-
-  Serial.println("1111111111111111111111111111");
+  //delay(100);
+  Serial.println("1111111111111111111111111");
 
   //  Relate to DHT
   dhtObject.read11(dht_pin); // DHT11 command to do measurements
@@ -161,11 +168,29 @@ void loop()
   float UVindex = uv.readUV();
   UVindex /= 100.0;  // the index is multiplied by 100 so to get the integer index, divide by 100!
   Serial.print("UV: ");  Serial.println(UVindex);
+    if (UVindex < 3.0){
+    RGB_color(0, 255, 0); // Green
+  } else if (UVindex >= 3 && UVindex < 6){
+    RGB_color(255, 255, 0); // Yellow
+  } else if (UVindex >= 6 && UVindex < 8) { 
+     RGB_color(240, 100, 0); // Orange
+  } else if (UVindex >= 8 && UVindex < 11) {
+     RGB_color(255, 0, 0); // Red
+  } else {
+    RGB_color(255, 0, 255); // Magenta
+  }
   Serial.println("555555555555555555555555555555");
-  //  Serial dat to send to PC
+  //  Serial data to send to PC
   
 
     
   delay(10000);  // Pause for 10 seconds before repeat the loop
 
+}
+
+void RGB_color(int red_light_value, int green_light_value, int blue_light_value)
+ {
+  analogWrite(red_light_pin, red_light_value);
+  analogWrite(green_light_pin, green_light_value);
+  analogWrite(blue_light_pin, blue_light_value);
 }

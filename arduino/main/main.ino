@@ -2,8 +2,10 @@
 //  for BMP180 sensor
 #include <SFE_BMP180.h>
 #include <Wire.h> // Library to communicate with I2C https://www.arduino.cc/en/reference/wire
+
 //  for DHT
-#include "dht.h"
+#include <dht.h>
+
 //  for Water-Sensor
 #define POWER_PIN  7
 #define SIGNAL_PIN A3
@@ -28,42 +30,65 @@ int value = 0;
 //  for SI1145
 Adafruit_SI1145 uv = Adafruit_SI1145();
 // for RGB Led
-int red_light_pin= 11;
-int green_light_pin = 10;
-int blue_light_pin = 9;
+
+#define red_pin 11
+#define green_pin 10
+#define blue_pin 9
 
 void setup()
 {
   Serial.begin(9600);
-  while(!Serial){ // wait till serial is initiated
-    ;
-    }
 
-//  Relate to BMP180
+  while(!Serial);
+
   if (bmp180Object.begin())
-    Serial.println("BMP180 inicializado com sucesso");
+  {
+    Serial.println("BMP180 inicializado com sucesso");    
+  }
   else
   {
     Serial.println("Inicialização do BMP180 falhou!");
     Serial.println("Verifique as ligações!");
-    while (1); // Stuck here in case BMP180 fails
+    return;
   }
-//  Related to Water-sensor
+
+  if (!uv.begin()) {
+    Serial.println("Didn't find Si1145");
+    return;
+  }
+
+  // Related to Water-sensor
   pinMode(POWER_PIN, OUTPUT);   // Configuração do D7 como pin output
   digitalWrite(POWER_PIN, LOW); // Desligar o sensor
 
-// Related to RGB Led
-  pinMode(red_light_pin, OUTPUT);
-  pinMode(green_light_pin, OUTPUT);
-  pinMode(blue_light_pin, OUTPUT);
-
+  // Related to RGB Led
+  pinMode(red_pin, OUTPUT);
+  pinMode(green_pin, OUTPUT);
+  pinMode(blue_pin, OUTPUT);
 }
-
 
 void loop()
 {
+  bmp180Measurements();
+  dhtMeasurements();
+  anemometerMeasurements();
+  waterSensorMeasurements();
+  uvSensorMeasurements();
+  
+  Serial.print("\n\n---------------------------------\n\n");
+  delay(5000);
+}
 
-  //  Related to BMP180
+
+void setRGBColor(int red, int green, int blue)
+{
+  analogWrite(red_pin, red);
+  analogWrite(green_pin, green);
+  analogWrite(blue_pin, blue);
+}
+
+void bmp180Measurements()
+{
   char status;
   //  Definição das variáveis para as leituras
   //  T: Temperatura
@@ -78,8 +103,7 @@ void loop()
     status = bmp180Object.getTemperature(T);  // Get the Temperature value from object bmp180Object
     if (status != 0)
     {
-      Serial.println();
-      Serial.println("BMP180 Measurements #####################: ");
+      Serial.println("\nBMP180 Measurements: ");
       Serial.print("Temperature: ");
       Serial.print(T, 2);
       Serial.println(" ºC");
@@ -103,7 +127,7 @@ void loop()
           a = bmp180Object.altitude(P, p0); // Conversão da Pressão Absoluta em Altitude.
           Serial.print("Altitude calculada: ");
           Serial.print(a, 2);
-          Serial.println(" meters, ");
+          Serial.println(" meters");
 
         }
         else Serial.println("Erro em recolher medidas do objecto bmp180Object");
@@ -113,44 +137,44 @@ void loop()
     else Serial.println("Erro em recolher a Temperatura medida");
   }
   else Serial.println("Erro em iniciar a medida de Temperatura");
-  //delay(100);
-  Serial.println("1111111111111111111111111");
 
-  //  Relate to DHT
+}
+
+void dhtMeasurements()
+{
   dhtObject.read11(dht_pin); // DHT11 command to do measurements
-  Serial.println( );
-  Serial.println("DHT11 Measurements #####################: ");
+  Serial.println("\nDHT11 Measurements:");
   Serial.print("Humidade: ");
   Serial.print(dhtObject.humidity);
-  Serial.print("%  ");
-  Serial.print("Temperatura: ");
+  Serial.print("%");
+  Serial.print("\nTemperatura: ");
   Serial.print(dhtObject.temperature);
-  Serial.println("ºC  ");
-  Serial.println("2222222222222222222222222222");
-        
-  //  Relater to Anemometer
+  Serial.print("ºC\n");
+}
+
+void anemometerMeasurements()
+{
   int sensorValue = analogRead(A1);
+
   //  Visual indicator by led if wanted
   analogWrite(ledPin, sensorValue * (51.0 / 1023.0) * 50);
 
-  if (sensorValue > 0) {
-    Serial.println( );
-    Serial.println("Anemometer Measurements #####################: ");
+  Serial.println("\nAnemometer Measurements: ");
+  if (sensorValue > 0)
+  {
     Serial.print("Valor do Anenometro: ");
     Serial.println(sensorValue);
-    Serial.println( "333333333333333333333333333");
-  } else {
-    Serial.println( );
-    Serial.println("Anemometer Measurements #####################: ");
-    Serial.println("Valor do Anenometro: 0");
-    Serial.println("333333333333333333333333333" );
-    }
-  Serial.println();
-  //delay(3000);
+  }
+  else
+  {
+    Serial.print("Valor do Anenometro: 0");
+  }
+}
 
+void waterSensorMeasurements()
+{
+  Serial.println("\nWater-sensor Measurements:");
   
-  //  Related to Water-sensor
-  Serial.println("Water-sensor Measurements #####################: ");
   digitalWrite(POWER_PIN, HIGH);  // Ligar o sensor
   delay(10);                      // Espera de 10 ms
   value = analogRead(SIGNAL_PIN); // Ler o valor analogico do sensor
@@ -158,39 +182,40 @@ void loop()
 
   Serial.print("Water-sensor value: ");
   Serial.println(value);
-  Serial.println("44444444444444444444444444444");
-  
-  //  Related to SI1145 UV sensor
-  Serial.println( );
-  Serial.println("UV Sensor #####################: ");
-  Serial.print("Vis: "); Serial.println(uv.readVisible());
-  Serial.print("IR: "); Serial.println(uv.readIR());
-  float UVindex = uv.readUV();
-  UVindex /= 100.0;  // the index is multiplied by 100 so to get the integer index, divide by 100!
-  Serial.print("UV: ");  Serial.println(UVindex);
-    if (UVindex < 3.0){
-    RGB_color(0, 255, 0); // Green
-  } else if (UVindex >= 3 && UVindex < 6){
-    RGB_color(255, 255, 0); // Yellow
-  } else if (UVindex >= 6 && UVindex < 8) { 
-     RGB_color(240, 100, 0); // Orange
-  } else if (UVindex >= 8 && UVindex < 11) {
-     RGB_color(255, 0, 0); // Red
-  } else {
-    RGB_color(255, 0, 255); // Magenta
-  }
-  Serial.println("555555555555555555555555555555");
-  //  Serial data to send to PC
-  
-
-    
-  delay(10000);  // Pause for 10 seconds before repeat the loop
-
 }
 
-void RGB_color(int red_light_value, int green_light_value, int blue_light_value)
- {
-  analogWrite(red_light_pin, red_light_value);
-  analogWrite(green_light_pin, green_light_value);
-  analogWrite(blue_light_pin, blue_light_value);
+void uvSensorMeasurements()
+{
+  Serial.println("\nUV Sensor:");
+  Serial.print("Vis: "); 
+  Serial.print(uv.readVisible());
+  Serial.print("\nIR: "); 
+  Serial.print(uv.readIR());
+
+  //float UVindex = 5;
+  float UVindex = uv.readUV();
+  UVindex /= 100.0;  // the index is multiplied by 100 so to get the integer index, divide by 100!
+  
+  Serial.print("\nUV: ");
+  Serial.println(UVindex);
+  if (UVindex < 3.0)
+  {
+    setRGBColor(0, 255, 0); // Green
+  }
+  else if (UVindex >= 3 && UVindex < 6)
+  {
+    setRGBColor(255, 255, 0); // Yellow
+  }
+  else if (UVindex >= 6 && UVindex < 8)
+  { 
+     setRGBColor(240, 100, 0); // Orange
+  }
+  else if (UVindex >= 8 && UVindex < 11)
+  {
+     setRGBColor(255, 0, 0); // Red
+  }
+  else 
+  {
+    setRGBColor(255, 0, 255); // Magenta
+  }
 }

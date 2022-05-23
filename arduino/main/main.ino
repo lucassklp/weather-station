@@ -35,8 +35,23 @@ Adafruit_SI1145 uv = Adafruit_SI1145();
 #define green_pin 10
 #define blue_pin 9
 
+//Zigbee parameters
+const byte frameStartByte = 0x7E;
+const byte frameTypeTXrequest = 0x10;
+const byte frameTypeRXpacket = 0x90;
+//const byte frameTypeATcommand = 0x08;
+const byte frameTypeATresponse = 0x88;
+const long destAddressHigh = 0x13A200;
+const long destAddressLow = 0x4092FEEF;
+char DBcommand[ ] = "DB";
+int sensorPin = 0; //the analog pin the TMP36's Vout (sense) pin is connected to
+byte ATcounter=0; // for identifying current AT command frame
+byte rssi=0; // RSSI value of last received packet
+
+
 void setup()
 {
+  DDRB = 1<<DDB5; // PB5/D13 is an output
   Serial.begin(9600);
 
   while(!Serial);
@@ -74,6 +89,8 @@ void loop()
   anemometerMeasurements();
   waterSensorMeasurements();
   uvSensorMeasurements();
+  
+  formatTXAPIpacket('A');
   
   Serial.print("\n\n---------------------------------\n\n");
   delay(5000);
@@ -218,4 +235,72 @@ void uvSensorMeasurements()
   {
     setRGBColor(255, 0, 255); // Magenta
   }
+}
+
+void formatTXAPIpacket(int value) { 
+  // Format and transmit a Transmit Request API frame
+  long sum = 0; // Accumulate the checksum
+
+  // API frame Start Delimiter
+  Serial.write(frameStartByte);
+
+  // Length - High and low parts of the frame length (Number of bytes between the length and the checksum)
+  Serial.write(0x00);
+  Serial.write(0x10);
+
+  // Frame Type - Indicate this frame contains a Transmit Request
+  Serial.write(frameTypeTXrequest); 
+  sum += frameTypeTXrequest;
+
+  // Frame ID - set to zero for no reply
+  Serial.write(0x00); 
+  sum += 0x00;
+
+  // 64-bit Destination Address - The following 8 bytes indicate the 64 bit address of the recipient (high and low parts).
+  // Use 0xFFFF to broadcast to all nodes.
+  Serial.write((destAddressHigh >> 24) & 0xFF);
+  Serial.write((destAddressHigh >> 16) & 0xFF);
+  Serial.write((destAddressHigh >> 8) & 0xFF);
+  Serial.write((destAddressHigh) & 0xFF);
+  sum += ((destAddressHigh >> 24) & 0xFF);
+  sum += ((destAddressHigh >> 16) & 0xFF);
+  sum += ((destAddressHigh >> 8) & 0xFF);
+  sum += (destAddressHigh & 0xFF);
+  Serial.write((destAddressLow >> 24) & 0xFF);
+  Serial.write((destAddressLow >> 16) & 0xFF);
+  Serial.write((destAddressLow >> 8) & 0xFF);
+  Serial.write(destAddressLow & 0xFF);
+  sum += ((destAddressLow >> 24) & 0xFF);
+  sum += ((destAddressLow >> 16) & 0xFF);
+  sum += ((destAddressLow >> 8) & 0xFF);
+  sum += (destAddressLow & 0xFF);
+
+  // 16-bit Destination Network Address - The following 2 bytes indicate the 16-bit address of the recipient.
+  // Use 0xFFFE if the address is unknown.
+  Serial.write(0xFF);
+  Serial.write(0xFE);
+  sum += 0xFF+0xFE;
+
+  // Broadcast Radius - when set to 0, the broadcast radius will be set to the maximum hops value
+  Serial.write(0x00);
+  sum += 0x00;
+
+  // Options
+  // 0x01 - Disable retries and route repair
+  // 0x20 - Enable APS encryption (if EE=1)
+  // 0x40 - Use the extended transmission timeout
+  Serial.write(0x00);
+  sum += 0x00;
+
+  // RF Data
+  Serial.write((value >> 8) & 0xFF);  // ADC temperature reading (high byte)
+  Serial.write(value & 0xFF);  // ADC temperature reading (low byte)
+  sum += ((value >> 8) & 0xFF)+(value & 0xFF); 
+//  Serial.write(rssi); // RSSI reading
+//  sum += rssi;
+
+  // Checksum = 0xFF - the 8 bit sum of bytes from offset 3 (Frame Type) to this byte.
+  Serial.write( 0xFF - ( sum & 0xFF));
+
+  delay(10); // Pause to let the microcontroller settle down if needed
 }

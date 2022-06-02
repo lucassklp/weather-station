@@ -30,15 +30,14 @@ app.Services.GetService<SensorServices>();
 app.UseRouting();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseAuthorization();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseEndpoints(endpoints =>
 {

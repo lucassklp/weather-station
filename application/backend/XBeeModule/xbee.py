@@ -2,6 +2,7 @@ from digi.xbee.devices import XBeeDevice
 import requests
 from datetime import datetime
 import json
+import random
 
 def getValue(hex, start, end):
     val = ""
@@ -26,8 +27,10 @@ def sendValue(pressao, humidade, temperatura, anenometro, water, uv):
     headers = {'Content-type': 'application/json'}
     requests.post(url, data=json.dumps(data), headers=headers)
 
-device = XBeeDevice("/dev/cu.usbserial-A4030QIG", 9600)
+#Debug purpose only
+#sendValue(pressao=random.randrange(0,5), humidade=random.randrange(0,20), temperatura=random.randrange(0,100), anenometro=random.randrange(0,1), water=random.randrange(0,5), uv=random.randrange(0,10))
 
+device = XBeeDevice("/dev/cu.usbserial-A4030QIG", 9600)
 print("Abrindo device...")
 device.open()
 print("Device aberto! Lendo dados...")

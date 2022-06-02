@@ -1,50 +1,50 @@
+<div class="flexbox-parent">
+    <div layout="row" layout-align="center center" style="min-height: 500px">
+        <!-- <div flex="15">First line</div>
+        <div flex="15">Second line</div> -->
 
 
-<div style="display: block; width: 600px; height: 400px;">
+        <div class="chart-container">
+            <canvas baseChart #temperatureChart
+                    [data]="temperatureChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
 
-    <canvas baseChart #temperatureChart
-            [data]="temperatureChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
+        <div class="chart-container">
+            <canvas baseChart #humidityChart
+                    [data]="humidityChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart #pressureChart
+                    [data]="pressureChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart #uvChart
+                    [data]="uvChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart #anenometerChart
+                    [data]="anenometerChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart #waterSensorChart
+                    [data]="waterSensorChartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType"></canvas>
+        </div>
+
 </div>
-
-
-<div style="display: block; width: 600px; height: 400px;">
-
-    <canvas baseChart #humidityChart
-            [data]="humidityChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
-</div>
-
-<div style="display: block; width: 600px; height: 400px;">
-
-    <canvas baseChart #pressureChart
-            [data]="pressureChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
-</div>
-
-<div style="display: block; width: 600px; height: 400px;">
-
-    <canvas baseChart #uvChart
-            [data]="uvChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
-</div>
-
-<div style="display: block; width: 600px; height: 400px;">
-
-    <canvas baseChart #anenometerChart
-            [data]="anenometerChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
-</div>
-
-<div style="display: block; width: 600px; height: 400px;">
-
-    <canvas baseChart #waterSensorChart
-            [data]="waterSensorChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType"></canvas>
 </div>

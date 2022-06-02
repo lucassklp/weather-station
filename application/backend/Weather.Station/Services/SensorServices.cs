@@ -11,33 +11,25 @@ namespace Weather.Station.Services
     {
         private readonly IObservable<WeatherStationValues> sensorObservable;
         private readonly DaoContext daoContext;
+        private readonly IHubContext<SensorHub> hubContext;
 
-
-        public SensorServices(DaoContext daoContext, ILogger<SensorServices> logger, IHubContext<SensorHub> hubContext)
+        public SensorServices(DaoContext daoContext, IHubContext<SensorHub> hubContext)
         {
             this.daoContext = daoContext;
-
-            // This part probably will be changed in the future to support ZigBee communication.
-            // For now, we use mocked values
-            logger.LogInformation("Setting up timer");
-            this.sensorObservable = Observable.Timer(TimeSpan.FromSeconds(5))
-                .Repeat()
-                .Select(_ => WeatherStationValues.Random());
-
-            // Asynchronously store the sensor values to database (I know Rx is beautiful <3)
-            sensorObservable.Subscribe(async sensorValues =>
-            {
-                await hubContext.Clients.Group("chart")
-                    .SendAsync("sensor-values", sensorValues);
-                
-                //daoContext.WeatherStation.Add(sensorValues);
-                //await daoContext.SaveChangesAsync();
-            });
+            this.hubContext = hubContext;
         }
 
         public IObservable<WeatherStationValues> GetRealTimeWeatherStationValues()
         {
             return this.sensorObservable;
+        }
+
+        public async Task PublishAndStoreValues(WeatherStationValues sensorValues)
+        {
+            await hubContext.Clients.Group("chart")
+                .SendAsync("sensor-values", sensorValues);
+            await daoContext.AddAsync(sensorValues);
+            await daoContext.SaveChangesAsync();
         }
 
         public List<WeatherStationValues> GetLastWeatherStationValues(int count)

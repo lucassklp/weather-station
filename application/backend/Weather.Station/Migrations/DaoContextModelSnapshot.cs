@@ -25,12 +25,6 @@ namespace Weather.Station.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<double>("AbsolutePressure")
-                        .HasColumnType("double");
-
-                    b.Property<double>("Altitude")
-                        .HasColumnType("double");
-
                     b.Property<double>("Anemometer")
                         .HasColumnType("double");
 
@@ -40,10 +34,13 @@ namespace Weather.Station.Migrations
                     b.Property<DateTime>("Instant")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<double>("SeaLevelPressure")
+                    b.Property<double>("Pressure")
                         .HasColumnType("double");
 
                     b.Property<double>("Temperature")
+                        .HasColumnType("double");
+
+                    b.Property<double>("UV")
                         .HasColumnType("double");
 
                     b.Property<double>("WaterSensor")

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -19,12 +20,12 @@ namespace Weather.Station.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Temperature = table.Column<double>(type: "double", nullable: false),
-                    AbsolutePressure = table.Column<double>(type: "double", nullable: false),
-                    SeaLevelPressure = table.Column<double>(type: "double", nullable: false),
-                    Altitude = table.Column<double>(type: "double", nullable: false),
+                    Pressure = table.Column<double>(type: "double", nullable: false),
+                    UV = table.Column<double>(type: "double", nullable: false),
                     Humidity = table.Column<double>(type: "double", nullable: false),
                     Anemometer = table.Column<double>(type: "double", nullable: false),
-                    WaterSensor = table.Column<double>(type: "double", nullable: false)
+                    WaterSensor = table.Column<double>(type: "double", nullable: false),
+                    Instant = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {

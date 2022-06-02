@@ -20,5 +20,11 @@ namespace Weather.Station.Controllers
         {
             return sensorServices.GetLastWeatherStationValues(10);
         }
+
+        [HttpPost]
+        public async Task Add(WeatherStationValues values)
+        {
+            await sensorServices.PublishAndStoreValues(values);
+        }
     }
 }

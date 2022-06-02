@@ -1,4 +1,7 @@
 from digi.xbee.devices import XBeeDevice
+import requests
+from datetime import datetime
+import json
 
 def getValue(hex, start, end):
     val = ""
@@ -7,6 +10,21 @@ def getValue(hex, start, end):
         val += str(int(analyzed, 16))
         start+=2
     return float(val)
+
+# Making http request
+def sendValue(pressao, humidade, temperatura, anenometro, water, uv):
+    url = "http://localhost:5000/api/weather-station"
+    data = {
+        "temperature": temperatura,
+        "pressure": pressao,
+        "uv": uv,
+        "humidity": humidade,
+        "anemometer": anenometro,
+        "waterSensor": water,
+        "instant": datetime.now().isoformat()
+    }
+    headers = {'Content-type': 'application/json'}
+    requests.post(url, data=json.dumps(data), headers=headers)
 
 device = XBeeDevice("/dev/cu.usbserial-A4030QIG", 9600)
 
@@ -37,7 +55,9 @@ while True:
             uv = getValue(hex, 20, 22)
             print("uv: " + str(uv))
 
-            #print(xbee_message.data.hex())
+            #Send data to server
+            sendValue(pressao, humidade, temperatura, anenometro, water, uv)
+            print("Informações enviadas com sucesso ao servidor.")
     except Exception as e:
         print("A mensagem não está no formato UTF-8")
         print(e)

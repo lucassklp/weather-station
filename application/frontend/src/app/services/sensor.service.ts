@@ -13,7 +13,7 @@ export class SensorService {
   
   constructor(private http: HttpClient) { 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5000/sensor`)
+      .withUrl(`http://localhost/sensor`)
       .build();
 
       this.hubConnection.start()

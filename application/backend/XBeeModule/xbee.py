@@ -14,7 +14,7 @@ def getValue(hex, start, end):
 
 # Making http request
 def sendValue(pressao, humidade, temperatura, anenometro, water, uv):
-    url = "http://localhost:5000/api/weather-station"
+    url = "http://localhost/api/weather-station"
     data = {
         "temperature": temperatura,
         "pressure": pressao,

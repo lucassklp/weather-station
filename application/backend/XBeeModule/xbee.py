@@ -58,6 +58,9 @@ while True:
             uv = getValue(hex, 20, 22)
             print("uv: " + str(uv))
 
+            rssi = getValue(hex, 22, 25)
+            print("rssi: " + str(rssi))
+
             #Send data to server
             sendValue(pressao, humidade, temperatura, anenometro, water, uv)
             print("Informações enviadas com sucesso ao servidor.")

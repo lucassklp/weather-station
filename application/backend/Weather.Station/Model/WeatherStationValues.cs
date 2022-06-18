@@ -10,5 +10,6 @@
         public double Anemometer { get; set; }
         public double WaterSensor { get; set; }
         public DateTime Instant { get; set; }
+        public double RSSI { get; set; }
     }
 }

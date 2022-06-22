@@ -6,5 +6,6 @@ export type WeatherStationValues = {
     humidity: number,
     anemometer: number,
     waterSensor: number,
+    rssi: number,
     instant: Date
 }

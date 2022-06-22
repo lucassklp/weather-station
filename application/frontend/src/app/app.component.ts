@@ -113,6 +113,23 @@ export class AppComponent implements OnInit{
     labels: [ ]
   };
 
+  public rssiChartData: ChartConfiguration['data'] = {
+    datasets: [
+      {
+        data: [ ],
+        label: 'Received Signal Strength Information (RSSI)',
+        backgroundColor: 'rgba(148,159,177,0.2)',
+        borderColor: 'rgba(148,159,177,1)',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        fill: 'origin',
+      }
+    ],
+    labels: [ ]
+  };
+
   public lineChartOptions: ChartConfiguration['options'] = {
     elements: {
       line: {
@@ -148,6 +165,8 @@ export class AppComponent implements OnInit{
   @ViewChild('waterSensorChart', {read: BaseChartDirective}) 
   waterSensorChart?: BaseChartDirective;
 
+  @ViewChild('rssiChart', {read: BaseChartDirective}) 
+  rssiChart?: BaseChartDirective;
 
   constructor(private sensorService: SensorService){
 
@@ -173,6 +192,9 @@ export class AppComponent implements OnInit{
       this.pushMany(this.waterSensorChartData, values, value => value.waterSensor)
       this.waterSensorChart?.update()
 
+      this.pushMany(this.rssiChartData, values, value => value.rssi)
+      this.rssiChart?.update()
+
       this.sensorService.getRealtimeSensorValues().subscribe(value => {
         this.pushOne(this.temperatureChartData, value.temperature, new Date(value.instant))
         this.temperatureChart?.update()
@@ -191,14 +213,16 @@ export class AppComponent implements OnInit{
 
         this.pushOne(this.waterSensorChartData, value.waterSensor, new Date(value.instant))
         this.waterSensorChart?.update()
+
+        this.pushOne(this.rssiChartData, value.rssi, new Date(value.instant))
+        this.rssiChart?.update()
       })
     })
   }
 
-  public pushOne(chart: ChartData, value: any, instant: Date): void {
-    console.log(value)
+  public pushOne(chart: ChartData, value: any, date: Date): void {
     chart.datasets[0].data.push(value)
-    chart.labels?.push(instant)
+    chart.labels?.push(`${date.toLocaleDateString("pt-BR")} ${date.toLocaleTimeString("pt-BR")}`)
   }
 
   public pushMany(chart: ChartData, values: WeatherStationValues[], fn: (val: WeatherStationValues) => number): void {

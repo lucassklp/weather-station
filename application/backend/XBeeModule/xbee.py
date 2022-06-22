@@ -8,7 +8,7 @@ def getValue(hex, start, end):
     val = ""
     for i in range(start, end, 2):
         analyzed = hex[start:i + 2]
-        val += str(int(analyzed, 16))
+        val += str(int(analyzed, 16)).rjust(2, '0')
         start+=2
     return float(val)
 
@@ -59,11 +59,11 @@ while True:
             uv = getValue(hex, 20, 22)
             print("uv: " + str(uv))
 
-            rssi = getValue(hex, 22, 25)
+            rssi = getValue(hex, 22, 26)
             print("rssi: " + str(rssi))
 
             #Send data to server
-            sendValue(pressao, humidade, temperatura, anenometro, water, uv)
+            sendValue(pressao, humidade, temperatura, anenometro, water, uv, rssi)
             print("Informações enviadas com sucesso ao servidor.")
     except Exception as e:
         print("A mensagem não está no formato UTF-8")

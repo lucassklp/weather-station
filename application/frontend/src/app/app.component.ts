@@ -147,6 +147,8 @@ export class AppComponent implements OnInit{
 
   public lineChartType: ChartType = 'line';
   
+  public isRaining: Boolean | null = null;
+
   @ViewChild('temperatureChart', {read: BaseChartDirective}) 
   temperatureChart?: BaseChartDirective;
 
@@ -216,6 +218,9 @@ export class AppComponent implements OnInit{
 
         this.pushOne(this.rssiChartData, value.rssi, new Date(value.instant))
         this.rssiChart?.update()
+
+        this.isRaining = value.waterSensor < 100;
+
       })
     })
   }

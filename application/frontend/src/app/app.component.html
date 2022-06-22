@@ -3,6 +3,9 @@
         <!-- <div flex="15">First line</div>
         <div flex="15">Second line</div> -->
 
+        <h2 class="" *ngIf="isRaining === null"> Aguardando valor do realtime para definir se é sol ou chuva... </h2>
+        <h2 class="" *ngIf="isRaining === true"> Está a chover! </h2>
+        <h2 class="" *ngIf="isRaining === false"> Não está a chover! </h2>
 
         <div class="chart-container">
             <canvas baseChart #temperatureChart

@@ -219,7 +219,7 @@ export class AppComponent implements OnInit{
         this.pushOne(this.rssiChartData, value.rssi, new Date(value.instant))
         this.rssiChart?.update()
 
-        this.isRaining = value.waterSensor < 100;
+        this.isRaining = value.waterSensor < 300;
 
       })
     })

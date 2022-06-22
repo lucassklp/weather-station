@@ -44,10 +44,10 @@ while True:
             pressao = getValue(hex, 0, 6) / 100
             print("Pressao: " + str(pressao))
 
-            humidade = getValue(hex, 6, 10) / 10
+            humidade = getValue(hex, 6, 10) / 100
             print("humidade: " + str(humidade))
 
-            temperatura = getValue(hex, 10, 14) / 10
+            temperatura = getValue(hex, 10, 14) / 100
             print("temperatura: " + str(temperatura))
 
             anenometro = getValue(hex, 14, 16)
